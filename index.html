@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>I ❤️ You — Proposal</title>
+  <style>
+    :root{
+      --bg1: #0f172a; /* deep indigo */
+      --accent: #ff4d6d; /* pinkish */
+      --accent-2:#ff8aa2;
+      --glass: rgba(255,255,255,0.06);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(255,77,109,0.06), transparent),
+                  radial-gradient(1000px 500px at 90% 90%, rgba(255,138,162,0.04), transparent),
+                  linear-gradient(180deg,var(--bg1), #071028);
+      display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff;
+    }
+
+    /* floating hearts */
+    .sky{position:fixed;inset:0;pointer-events:none}
+    .heart{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);filter:drop-shadow(0 6px 18px rgba(0,0,0,0.45));}
+
+    /* central card */
+    .card{
+      width:min(920px,94vw);max-width:1000px;padding:28px;border-radius:20px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));backdrop-filter: blur(8px);box-shadow: 0 10px 40px rgba(2,6,23,0.6);display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:center;
+    }
+
+    .left{
+      padding:18px 12px;
+    }
+    h1{font-size:clamp(28px,4vw,48px);margin:0 0 8px;line-height:1.02;letter-spacing:-0.02em}
+    .subtitle{color:rgba(255,255,255,0.8);margin-bottom:16px}
+
+    /* Typewriter message */
+    .message{font-size:20px;min-height:120px;display:flex;align-items:center}
+    .typewriter{font-weight:600;font-size:30px}
+    .cursor{display:inline-block;width:2px;height:1.2em;background:#fff;margin-left:8px;animation:blink 900ms steps(2,start) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    /* buttons */
+    .controls{margin-top:18px;display:flex;gap:12px}
+    button{appearance:none;border:0;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:0 6px 20px rgba(255,77,109,0.16);}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.9)}
+
+    /* right side big heart */
+    .right{display:flex;align-items:center;justify-content:center}
+    .big-heart{width:320px;height:320px;display:grid;place-items:center}
+    .heart-svg{width:80%;height:80%;transform-origin:center;animation:pulse 1400ms ease-in-out infinite}
+    @keyframes pulse{0%{transform:scale(0.92)}50%{transform:scale(1)}100%{transform:scale(0.92)}}
+
+    /* floating small hearts animation */
+    .floating-heart{position:absolute;width:18px;height:18px;background:var(--accent);transform:rotate(45deg);border-radius:3px 0 0 3px;opacity:0.9}
+    .floating-heart:before,.floating-heart:after{content:'';position:absolute;background:var(--accent);border-radius:50%;}
+    .floating-heart:before{width:18px;height:18px;top:-9px;left:0}
+    .floating-heart:after{width:18px;height:18px;left:9px;top:0}
+
+    /* confetti / burst canvas sits on top */
+    canvas#burst{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
+
+    /* responsive */
+    @media (max-width:880px){
+      .card{grid-template-columns:1fr; padding:18px}
+      .right{order:-1;margin-bottom:10px}
+      .big-heart{width:220px;height:220px}
+    }
+
+    /* footer small note */
+    .note{font-size:13px;color:rgba(255,255,255,0.6);margin-top:12px}
+  </style>
+</head>
+<body>
+  <div class="sky" aria-hidden>
+    <!-- animated SVG hearts (decorative) -->
+    <svg class="heart" viewBox="0 0 24 24" style="left:12%;top:20%;animation:float 9s ease-in-out infinite;opacity:0.9;width:56px;height:56px">
+      <path fill="url(#g1)" d="M12 21s-8-5.5-8-11a5 5 0 0 1 8-3 5 5 0 0 1 8 3c0 5.5-8 11-8 11z"/>
+      <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ff8aa2"/><stop offset="1" stop-color="#ff4d6d"/></linearGradient></defs>
+    </svg>
+    <svg class="heart" viewBox="0 0 24 24" style="left:72%;top:10%;animation:float 11s ease-in-out infinite;opacity:0.85;width:78px;height:78px">
+      <path fill="url(#g2)" d="M12 21s-8-5.5-8-11a5 5 0 0 1 8-3 5 5 0 0 1 8 3c0 5.5-8 11-8 11z"/>
+      <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#ffd2e0"/><stop offset="1" stop-color="#ff6b87"/></linearGradient></defs>
+    </svg>
+  </div>
+
+  <div class="card" role="main">
+    <div class="left">
+      <h1>Just me, and one small question...</h1>
+      <div class="subtitle">I made this little moment just for you — click the button when you're ready.</div>
+
+      <div class="message">
+        <div class="typewriter" id="message"> </div><div class="cursor" id="cursor"></div>
+      </div>
+
+      <div class="controls">
+        <button id="showBtn">Say it — show the message</button>
+        <button class="secondary" id="surpriseBtn">Surprise animation</button>
+      </div>
+
+      <div class="note">Tip: click anywhere on the big heart to create floating hearts. Refresh to restart.</div>
+    </div>
+
+    <div class="right">
+      <div class="big-heart" id="bigHeart" title="Click me">
+        <!-- SVG heart with stroke animation -->
+        <svg class="heart-svg" viewBox="0 0 24 24" id="svgHeart" role="img" aria-label="heart">
+          <defs>
+            <linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#ff8aa2"/><stop offset="1" stop-color="#ff4d6d"/></linearGradient>
+          </defs>
+          <path id="heartPath" d="M12 21s-8-5.5-8-11a5 5 0 0 1 8-3 5 5 0 0 1 8 3c0 5.5-8 11-8 11z" fill="url(#lg)" stroke="rgba(255,255,255,0.12)" stroke-width="0.8"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="burst" width="800" height="600"></canvas>
+
+  <script>
+    // ------------------------- Typewriter message -------------------------
+    const messageEl = document.getElementById('message');
+    const cursor = document.getElementById('cursor');
+    const showBtn = document.getElementById('showBtn');
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    const bigHeart = document.getElementById('bigHeart');
+
+    const LOVE_LINES = [
+      "I love you.",
+      "From the tiny moments to the big ones.",
+      "You make my ordinary feel like magic.",
+      "Will you be mine?"
+    ];
+
+    let tIndex = 0;
+    let charIndex = 0;
+    let typing = false;
+    let typedOnce = false;
+
+    function typeNext() {
+      if (tIndex >= LOVE_LINES.length) { cursor.style.display='none'; return; }
+      const line = LOVE_LINES[tIndex];
+      if (charIndex < line.length) {
+        messageEl.textContent += line.charAt(charIndex);
+        charIndex++;
+        setTimeout(typeNext, 80 + Math.random()*80);
+      } else {
+        tIndex++;
+        charIndex = 0;
+        messageEl.textContent += '\n\n';
+        setTimeout(typeNext, 700);
+      }
+    }
+
+    showBtn.addEventListener('click', ()=>{
+      if (typing) return;
+      if (typedOnce) { // replay quickly
+        messageEl.textContent = '';
+        tIndex=0;charIndex=0;cursor.style.display='inline-block';
+      }
+      typing = true; typedOnce=true; typeNext();
+      // gentle burst
+      setTimeout(()=>fireBurst(window.innerWidth/2, window.innerHeight/2, 18), 850);
+      playChime();
+      setTimeout(()=>typing=false, 4000);
+    });
+
+    surpriseBtn.addEventListener('click', ()=>{
+      // big confetti + hearts
+      fireConfetti(window.innerWidth/2, window.innerHeight/4, 160);
+      playChime(1.2);
+    });
+
+    // ------------------------- click hearts generator -------------------------
+    bigHeart.addEventListener('click', (e)=>{
+      const rect = bigHeart.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      spawnFloatingHearts(cx, cy, 12);
+      fireBurst(cx, cy, 26);
+      playChime(0.9);
+    });
+
+    // ------------------------- canvas burst/confetti -------------------------
+    const canvas = document.getElementById('burst');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+
+    function fireBurst(x,y,count){
+      const particles = [];
+      for(let i=0;i<count;i++){
+        particles.push({x,y,vx: rand(-6,6), vy: rand(-10,-2), life: rand(700,1400), size: rand(6,18), t:0, color: `hsl(${rand(330,360)},80%,60%)`} )
+      }
+      animateParticles(particles);
+    }
+
+    function fireConfetti(x,y,count){
+      const conf = [];
+      for(let i=0;i<count;i++){
+        conf.push({x,y,vx:rand(-8,8), vy:rand(-14,-3), life:rand(1000,2600), size:rand(6,12), t:0, color: `hsl(${rand(300,360)},70%,60%)`, rot: rand(0,Math.PI*2)});
+      }
+      animateParticles(conf,true);
+    }
+
+    function animateParticles(arr,isRect=false){
+      const start = performance.now();
+      function frame(now){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        let alive = false;
+        for(const p of arr){
+          p.t += 16.67;
+          if(p.t < p.life){
+            alive = true;
+            const progress = p.t / p.life;
+            p.vy += 0.12; // gravity
+            p.x += p.vx; p.y += p.vy;
+            ctx.save();
+            ctx.globalAlpha = 1 - progress;
+            if(isRect){
+              ctx.translate(p.x,p.y); ctx.rotate(p.rot + progress*4);
+              ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+            } else {
+              // heart-shaped particle
+              drawMiniHeart(p.x,p.y,p.size,p.color,1-progress);
+            }
+            ctx.restore();
+          }
+        }
+        if(alive) requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function drawMiniHeart(x,y,size,color,alpha){
+      ctx.save(); ctx.translate(x,y); ctx.scale(size/24,size/24);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(12,21);
+      ctx.bezierCurveTo(12,21,4,16.5,4,11.5);
+      ctx.bezierCurveTo(4,7.5,7.5,5,11.5,6.5);
+      ctx.bezierCurveTo(13.5,7.4,14.5,9.2,15,10.6);
+      ctx.bezierCurveTo(15.5,9.2,16.5,7.4,18.5,6.5);
+      ctx.bezierCurveTo(22.5,5,26,7.5,26,11.5);
+      ctx.bezierCurveTo(26,16.5,18,21,18,21);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ------------------------- spawn floating DOM hearts -------------------------
+    function spawnFloatingHearts(x,y,count=8){
+      for(let i=0;i<count;i++){
+        const h = document.createElement('div');
+        h.className='floating-heart';
+        const size = rand(12,28);
+        h.style.width = size+'px'; h.style.height=size+'px';
+        h.style.left = (x + rand(-80,80)) + 'px';
+        h.style.top = (y + rand(-20,20)) + 'px';
+        h.style.opacity = 0.95;
+        document.body.appendChild(h);
+        const toY = -200 + rand(-20,30);
+        const rot = rand(-60,60);
+        h.animate([
+          {transform:`translateY(0px) rotate(${rot}deg) scale(1)`, opacity:1},
+          {transform:`translateY(${toY}px) rotate(${rot+150}deg) scale(${rand(0.6,1.3)})`, opacity:0}
+        ],{duration:2000+rand(400,1600),easing:'cubic-bezier(.2,.7,.2,1)'});
+        setTimeout(()=>{ h.remove(); }, 3000+Math.random()*1400);
+      }
+    }
+
+    // ------------------------- gentle audio chime (WebAudio) -------------------------
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playChime(rate=1.0){
+      try{
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 420 * rate;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        g.gain.linearRampToValueAtTime(0.14, now + 0.02);
+        o.start(now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+        o.frequency.setValueAtTime(420*rate, now);
+        o.frequency.exponentialRampToValueAtTime(880*rate, now + 1.0);
+        o.stop(now + 1.05);
+      }catch(e){/* autoplay blocked or not allowed */}
+    }
+
+    // ------------------------- initial tiny float animation for decorative SVGs -------------------------
+    const floatEls = document.querySelectorAll('.heart');
+    floatEls.forEach((el,i)=>{
+      const dur = 8000 + i*1000;
+      el.animate([{transform:'translateY(0px) rotate(0deg)'},{transform:'translateY(-40px) rotate(8deg)'},{transform:'translateY(0px) rotate(0deg)'}],{duration:dur,iterations:Infinity,easing:'ease-in-out'});
+    });
+
+    // small helper to fire confetti/particle from center on load for subtle effect
+    setTimeout(()=>{
+      fireBurst(window.innerWidth/2, window.innerHeight/2 - 80, 10);
+    }, 800);
+
+  </script>
+</body>
+</html>
